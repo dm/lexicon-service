@@ -94,12 +94,12 @@ for i in $(seq 0 $(($(jq length "$CONFIG") - 1))); do
   echo "[ddns] IP changed for $name ($source): ${last_ip:-none} -> $current_ip"
   echo "[ddns] Updating $type $name -> $current_ip (zone: $zone, provider: $provider)"
 
-  if lexicon "$provider" --delegated "$zone" update "$zone" "$type" --name "$name" --content "$current_ip" 2>&1; then
+  if lexicon "$provider" update "$zone" "$type" --name "$name" --content "$current_ip" 2>&1; then
     echo "[ddns] Updated: $type $name -> $current_ip"
     echo "$current_ip" > "$last_ip_file"
   else
     echo "[ddns] Update failed, trying create..."
-    if lexicon "$provider" --delegated "$zone" create "$zone" "$type" --name "$name" --content "$current_ip" 2>&1; then
+    if lexicon "$provider" create "$zone" "$type" --name "$name" --content "$current_ip" 2>&1; then
       echo "[ddns] Created: $type $name -> $current_ip"
       echo "$current_ip" > "$last_ip_file"
     else

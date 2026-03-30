@@ -29,21 +29,16 @@ for i in $(seq 0 $((record_count - 1))); do
 
   echo "[sync] Ensuring $type $name -> $content (zone: $zone, provider: $provider)"
 
-  lexicon_args="$provider --delegated $zone update $zone $type --name $name --content $content"
-
+  priority_args=""
   if [ -n "$priority" ]; then
-    lexicon_args="$lexicon_args --priority $priority"
+    priority_args="--priority $priority"
   fi
 
-  if lexicon $lexicon_args 2>&1; then
+  if lexicon "$provider" update "$zone" "$type" --name "$name" --content "$content" $priority_args 2>&1; then
     echo "[sync] OK: $type $name"
   else
     echo "[sync] Update failed, trying create..."
-    lexicon_args_create="$provider --delegated $zone create $zone $type --name $name --content $content"
-    if [ -n "$priority" ]; then
-      lexicon_args_create="$lexicon_args_create --priority $priority"
-    fi
-    if lexicon $lexicon_args_create 2>&1; then
+    if lexicon "$provider" create "$zone" "$type" --name "$name" --content "$content" $priority_args 2>&1; then
       echo "[sync] Created: $type $name"
     else
       echo "[sync] FAILED: $type $name"
