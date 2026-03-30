@@ -34,15 +34,12 @@ for i in $(seq 0 $((record_count - 1))); do
     priority_args="--priority $priority"
   fi
 
-  if lexicon "$provider" update "$zone" "$type" --name "$name" --content "$content" $priority_args 2>&1; then
-    echo "[sync] OK: $type $name"
+  if lexicon "$provider" update "$zone" "$type" --name "$name" --content "$content" $priority_args > /dev/null 2>&1; then
+    echo "[sync] Updated $type $name -> $content"
+  elif lexicon "$provider" create "$zone" "$type" --name "$name" --content "$content" $priority_args > /dev/null 2>&1; then
+    echo "[sync] Created $type $name -> $content"
   else
-    echo "[sync] Update failed, trying create..."
-    if lexicon "$provider" create "$zone" "$type" --name "$name" --content "$content" $priority_args 2>&1; then
-      echo "[sync] Created: $type $name"
-    else
-      echo "[sync] FAILED: $type $name"
-    fi
+    echo "[sync] FAILED $type $name -> $content (zone: $zone, provider: $provider)"
   fi
 done
 
